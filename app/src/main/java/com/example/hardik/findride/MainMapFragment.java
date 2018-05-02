@@ -5,17 +5,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
-import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Looper;
 import android.provider.Settings;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -26,30 +24,28 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
-import android.widget.SimpleAdapter;
 import android.widget.Toast;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.ApiException;
-import com.google.android.gms.common.api.GoogleApiClient;
-
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.places.Place;
-import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
-import com.google.android.gms.location.places.ui.PlaceSelectionListener;
-import com.google.android.gms.location.places.ui.SupportPlaceAutocompleteFragment;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -62,12 +58,8 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
-import static android.content.Context.LOCATION_SERVICE;
 
 /**
  * Created by hardik on 9/9/17.
@@ -79,16 +71,24 @@ public class MainMapFragment extends Fragment implements OnMapReadyCallback, Vie
     MainMapFragmentToMyRidesFragment mainMapFragmentToMyRidesFragment;
     AutoCompleteTextView atvStartPlace;
     View rootview;
-        FusedLocationProviderClient mFusedLocationClient;
+    Button btnFindUserLocation,btnStartNavigation;
+    MarkerOptions myLocation;
+    Marker myMarker=null;
+    FusedLocationProviderClient mFusedLocationClient;
     LocationRequest mLocationRequest;
+    String lat,lng;
 
     LocationCallback mLocationCallback = new LocationCallback(){
         @Override
         public void onLocationResult(LocationResult locationResult) {
             Log.d("MainActivity", "onLocationResult:"+locationResult);
             for (Location location : locationResult.getLocations()) {
+                lat= String.valueOf(location.getLatitude());
+                lng= String.valueOf(location.getLongitude());
                 Log.i("MainActivity", "Location: " + location.getLatitude() + " " + location.getLongitude());
-                goToLocation(location.getLatitude() , location.getLongitude(),30);
+                goToLocation(location.getLatitude() , location.getLongitude(),15, 1);
+                atvStartPlace.setText(location.getLatitude()+","+location.getLongitude());
+               // createVolleyRequest();
 
                 //tvlatlng.setText("Time: "+new Date()+" | "+location.getLatitude()+"  /  "+location.getLongitude());
             }
@@ -96,6 +96,27 @@ public class MainMapFragment extends Fragment implements OnMapReadyCallback, Vie
 
     };
 
+    private void createVolleyRequest() {
+        // Instantiate the RequestQueue.
+        RequestQueue queue = Volley.newRequestQueue(getActivity());
+        String url ="https://maps.googleapis.com/maps/api/geocode/json?latlng=40.714224,-73.961452&key=AIzaSyDP918XH297Y5hHwbeRm0q9GmyTjgWXx1M";
+
+// Request a string response from the provided URL.
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        // Display the first 500 characters of the response string.
+                        Toast.makeText(getContext(), response, Toast.LENGTH_SHORT).show();
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(getContext(), "Failed", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+    }
 
 
     @Nullable
@@ -120,8 +141,10 @@ public class MainMapFragment extends Fragment implements OnMapReadyCallback, Vie
             mapView.getMapAsync(this);
         }
 
-        Button getUserLocation = (Button) view.findViewById(R.id.btnFindUserLocation);
-        getUserLocation.setOnClickListener(this);
+        btnFindUserLocation = (Button) view.findViewById(R.id.btnFindUserLocation);
+        btnFindUserLocation.setOnClickListener(this);
+
+        btnStartNavigation= (Button) view.findViewById(R.id.btnStartNavigation);
 
 
         atvStartPlace = (AutoCompleteTextView) rootview.findViewById(R.id.atvStartPlace);
@@ -165,10 +188,20 @@ public class MainMapFragment extends Fragment implements OnMapReadyCallback, Vie
 
 
 
-        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
-        Log.d("MainActivity", "onCreate:"+mFusedLocationClient);
-        requestLocationUpdates();
 
+        btnStartNavigation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+               // String strUri = "http://maps.google.com/maps?q=loc:" + lat + "," + lng + " (" + "Label which you want" + ")";
+                Uri gmmIntentUri = Uri.parse("geo:37.7749,-122.4194");
+
+                Intent intent = new Intent(android.content.Intent.ACTION_VIEW, gmmIntentUri);
+
+                intent.setClassName("com.google.android.apps.maps", "com.google.android.maps.MapsActivity");
+
+                startActivity(intent);
+            }
+        });
 
     }
 
@@ -203,6 +236,27 @@ public class MainMapFragment extends Fragment implements OnMapReadyCallback, Vie
             Toast.makeText(getActivity(), "" + Manifest.permission.ACCESS_FINE_LOCATION + " is already granted.", Toast.LENGTH_SHORT).show();
         }
     }
+
+    public boolean CheckGpsStatus(Context context){
+        LocationManager locationManager ;
+        boolean GpsStatus ;
+
+        locationManager = (LocationManager)context.getSystemService(Context.LOCATION_SERVICE);
+
+        GpsStatus = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        if(!GpsStatus){
+            Intent myIntent = new Intent( Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+            context.startActivity(myIntent);
+        }
+        Toast.makeText(getActivity(), "MainMapFragment"+GpsStatus, Toast.LENGTH_SHORT).show();
+        if(GpsStatus)
+            return true;
+        else
+            return false;
+
+
+    }
+
 
 
 
@@ -257,6 +311,14 @@ public class MainMapFragment extends Fragment implements OnMapReadyCallback, Vie
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btnFindUserLocation:
+                if(CheckGpsStatus(getActivity()));{
+                mFusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
+                Log.d("MainActivity", "onCreate:"+mFusedLocationClient);
+                requestLocationUpdates();
+            }
+
+                break;
+
 
 
 
@@ -404,14 +466,35 @@ public class MainMapFragment extends Fragment implements OnMapReadyCallback, Vie
         MapsInitializer.initialize(getContext());
         mGoogleMap=googleMap;
         googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-        goToLocation(20.5937,78.9629,4);
+        goToLocation(20.5937,78.9629,4,0);
 
 
     }
-    private void goToLocation(double lat, double lng, float zoom) {
+    private void goToLocation(double lat, double lng, float zoom, int i) {
         LatLng ll = new LatLng(lat, lng);
-        CameraUpdate cameraupdate = CameraUpdateFactory.newLatLngZoom(ll, zoom);
-        mGoogleMap.animateCamera(cameraupdate);
+        if(i==0){
+
+
+            CameraUpdate cameraupdate = CameraUpdateFactory.newLatLngZoom(ll, zoom);
+            mGoogleMap.animateCamera(cameraupdate);
+        }else{
+
+            if(myMarker!=null) {
+                myMarker.remove();
+                myMarker=null;
+            }
+            if(myMarker==null){
+                myLocation=new MarkerOptions();
+                myLocation.title("MyLocation");
+                myLocation.position(ll);
+                CameraUpdate cameraupdate = CameraUpdateFactory.newLatLngZoom(ll, zoom);
+                mGoogleMap.animateCamera(cameraupdate);
+                myMarker=mGoogleMap.addMarker(myLocation);
+            }
+
+        }
+
+
 
 
     }
