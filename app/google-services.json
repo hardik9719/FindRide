@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "963412384914",
+    "firebase_url": "https://findride-d2f5b.firebaseio.com",
+    "project_id": "findride-d2f5b",
+    "storage_bucket": "findride-d2f5b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:963412384914:android:34425f7af6e55531",
+        "android_client_info": {
+          "package_name": "com.example.hardik.findride"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "963412384914-u89mf220i53v8nnm3hohskg5ggidk895.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.hardik.findride",
+            "certificate_hash": "a374158b213d683f7dba2067cf9966b6588f7ae3"
+          }
+        },
+        {
+          "client_id": "963412384914-iiaeak8qjb6vooklqlmgvl8m74sa6fvb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyABTMPe77QG_IKGM6vNc7ZUwy9thNmNOyo"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "963412384914-iiaeak8qjb6vooklqlmgvl8m74sa6fvb.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

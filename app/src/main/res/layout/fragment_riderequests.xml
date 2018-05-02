@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent">
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="Create a Ride"
+        android:textSize="40dp"
+        android:textStyle="bold"/>
+
+    <AutoCompleteTextView
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/atvStartPlace"
+        android:dropDownHeight="200dp"
+        android:background="@color/cardview_light_background"
+
+        android:layout_marginTop="58dp"
+        android:hint="Start Address"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true" />
+
+
+
+    <AutoCompleteTextView
+        android:layout_width="300dp"
+        android:background="@color/cardview_light_background"
+
+        android:layout_height="wrap_content"
+        android:id="@+id/atvEndPlace"
+        android:hint="End Address"
+        android:layout_marginTop="40dp"
+        android:layout_below="@+id/atvStartPlace"
+        android:layout_alignStart="@+id/atvStartPlace" />
+
+    <Spinner
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/TypeOfRide"
+        android:hint="Type of Ride"
+        android:layout_below="@+id/atvEndPlace"
+        android:layout_alignStart="@+id/atvEndPlace"
+        android:layout_marginTop="38dp" />
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Create Ride"
+        android:id="@+id/create"
+        android:layout_below="@+id/noPass"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="77dp" />
+</RelativeLayout>

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+
+    <com.google.android.gms.maps.MapView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/mymap"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+
+
+    <!--  <android.support.v7.widget.CardView
+          xmlns:card_view="http://schemas.android.com/apk/res-auto"
+          android:id="@+id/startAddresscard_view"
+          android:layout_gravity="top"
+          android:layout_margin="10dp"
+          android:layout_width="match_parent"
+          android:layout_height="40dp"
+          card_view:cardCornerRadius="4dp">
+          <fragment
+          android:id="@+id/startAdd"
+          android:name="com.google.android.gms.location.places.ui.SupportPlaceAutocompleteFragment"
+          android:layout_width="match_parent"
+          android:layout_height="match_parent"
+          />
+      </android.support.v7.widget.CardView>-->
+
+
+
+
+
+    <AutoCompleteTextView
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/atvStartPlace"
+        android:dropDownHeight="200dp"
+        android:background="@color/cardview_light_background"
+
+        android:layout_marginTop="38dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true" />
+
+
+
+    <AutoCompleteTextView
+        android:layout_width="300dp"
+        android:background="@color/cardview_light_background"
+
+        android:layout_height="wrap_content"
+        android:id="@+id/atvEndPlace"
+        android:hint="AutoComplete"
+        android:layout_marginTop="40dp"
+        android:layout_below="@+id/atvStartPlace"
+        android:layout_alignStart="@+id/atvStartPlace" />
+
+
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Find Ride"
+        android:id="@+id/btnFindUserLocation"
+        android:layout_below="@+id/atvEndPlace"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="16dp"
+        />
+
+
+</RelativeLayout>
+
